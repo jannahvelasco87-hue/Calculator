@@ -1,98 +1,256 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ScrollView,
+  useColorScheme,
+} from 'react-native';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+function Display({ value, dark }: { value: string; dark: boolean }) {
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <View style={styles.display}>
+      <Text
+        style={[styles.result, { color: dark ? '#FFFFFF' : '#4A235A' }]}
+        numberOfLines={1}
+      >
+        {value}
+      </Text>
+    </View>
   );
 }
 
-export default function HomeScreen() {
+function CalcButton({
+  title,
+  onPress,
+  color,
+  dark,
+}: {
+  title: string;
+  onPress: () => void;
+  color?: string;
+  dark: boolean;
+}) {
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.button,
+        {
+          backgroundColor: color || (dark ? '#34243F' : '#F3E5F5'),
+          opacity: pressed ? 0.6 : 1,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.buttonText,
+          { color: color ? '#FFFFFF' : dark ? '#FFFFFF' : '#6A1B9A' },
+        ]}
+      >
+        {title}
+      </Text>
+    </Pressable>
+  );
+}
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+export default function Calculator() {
+  const scheme = useColorScheme();
+  const dark = scheme === 'dark';
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
+  const [input, setInput] = useState('0');
+  const [firstValue, setFirstValue] = useState<number | null>(null);
+  const [operator, setOperator] = useState<string | null>(null);
+  const [waiting, setWaiting] = useState(false);
+  const [history, setHistory] = useState<string[]>([]);
+
+  function buttonPress(value: string) {
+    if (value === 'C') {
+      setInput('0');
+      setFirstValue(null);
+      setOperator(null);
+      setWaiting(false);
+      return;
+    }
+
+    if (value === 'DEL') {
+      setInput(input.length > 1 ? input.slice(0, -1) : '0');
+      return;
+    }
+
+    if (['+', '-', '×', '÷'].includes(value)) {
+      setFirstValue(Number(input));
+      setOperator(value);
+      setWaiting(true);
+      return;
+    }
+
+    if (value === '=') {
+      if (firstValue === null || operator === null) return;
+
+      const secondValue = Number(input);
+      let result = 0;
+
+      if (operator === '+') result = firstValue + secondValue;
+      if (operator === '-') result = firstValue - secondValue;
+      if (operator === '×') result = firstValue * secondValue;
+      if (operator === '÷') {
+        if (secondValue === 0) {
+          setInput('Error');
+          setFirstValue(null);
+          setOperator(null);
+          setWaiting(true);
+          return;
+        }
+        result = firstValue / secondValue;
+      }
+
+      const expression = `${firstValue} ${operator} ${secondValue} = ${result}`;
+      setHistory((old) => [expression, ...old].slice(0, 5));
+      setInput(String(Number(result.toFixed(8))));
+      setFirstValue(null);
+      setOperator(null);
+      setWaiting(true);
+      return;
+    }
+
+    if (value === '.') {
+      if (waiting) {
+        setInput('0.');
+        setWaiting(false);
+      } else if (!input.includes('.')) {
+        setInput(input + '.');
+      }
+      return;
+    }
+
+    if (waiting || input === '0' || input === 'Error') {
+      setInput(value);
+      setWaiting(false);
+    } else {
+      setInput(input + value);
+    }
+  }
+
+  const buttons = [
+    'C', 'DEL', '÷', '×',
+    '7', '8', '9', '-',
+    '4', '5', '6', '+',
+    '1', '2', '3', '=',
+    '0', '.', 
+  ];
+
+  return (
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: dark ? '#1C1424' : '#FFF0F8' },
+      ]}
+      contentContainerStyle={styles.content}
+    >
+      <Text style={[styles.title, { color: dark ? '#E8B8FF' : '#A64AC9' }]}>
+        PinkCalc ♡
+      </Text>
+
+      <Display value={input} dark={dark} />
+
+      <View style={styles.grid}>
+        {buttons.map((item) => (
+          <CalcButton
+            key={item}
+            title={item}
+            onPress={() => buttonPress(item)}
+            dark={dark}
+            color={
+              item === '='
+                ? '#A64AC9'
+                : ['+', '-', '×', '÷'].includes(item)
+                ? '#C77DFF'
+                : item === 'C' || item === 'DEL'
+                ? '#E75480'
+                : undefined
+            }
           />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        ))}
+      </View>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      <Text style={[styles.historyTitle, { color: dark ? '#E8B8FF' : '#A64AC9' }]}>
+        Calculation History
+      </Text>
+
+      {history.length === 0 ? (
+        <Text style={{ color: dark ? '#CCCCCC' : '#777777' }}>
+          No calculations yet ♡
+        </Text>
+      ) : (
+        history.map((item, index) => (
+          <Text
+            key={index}
+            style={[
+              styles.historyItem,
+              { color: dark ? '#FFFFFF' : '#4A235A' },
+            ]}
+          >
+            {item}
+          </Text>
+        ))
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+  content: {
+    padding: 20,
+    paddingTop: 50,
   },
   title: {
+    fontSize: 30,
+    fontWeight: 'bold',
     textAlign: 'center',
+    marginBottom: 25,
   },
-  code: {
-    textTransform: 'uppercase',
+  display: {
+    minHeight: 100,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    marginBottom: 20,
+    padding: 15,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  result: {
+    fontSize: 45,
+    fontWeight: 'bold',
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  button: {
+    width: '22%',
+    height: 70,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  historyTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginTop: 30,
+    marginBottom: 10,
+  },
+  historyItem: {
+    fontSize: 16,
+    marginBottom: 8,
   },
 });
