@@ -1,56 +1,54 @@
-# Welcome to your Expo app 👋
+Calculator App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+About the Project
 
-## Get started
+This is my simple Calculator App made using React Native and Expo for our school activity. It helps users solve basic math problems.
 
-1. Install dependencies
+Features
 
-   ```bash
-   npm install
-   ```
+- Addition (+) – adds numbers.
+- Subtraction (-) – subtracts numbers.
+- Multiplication (×) – multiplies numbers.
+- Division (÷) – divides numbers.
+- Clear (C) – clears the input.
+- Delete (DEL) – removes the last input.
+- History – shows previous calculations.
+- Dark Mode – supports dark mode.
 
-2. Start the app
+How to Use
 
-   ```bash
-   npx expo start
-   ```
+1. Open the Calculator App.
+2. Enter the numbers.
+3. Choose an operation.
+4. Press the equals button to see the result.
 
-In the output, you'll find options to open the app in a
+Get Started
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Install the dependencies:
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+npm install
 
-## Get a fresh project
+Start the app:
 
-When you're ready, run:
+npx expo start
 
-```bash
-npm run reset-project
-```
+You can open the app using Expo Go.
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Project Directory
 
-### Other setup steps
+You can edit the app files inside the "src/app" directory.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Technologies Used
 
-## Learn more
+- React Native
+- Expo
+- TypeScript
 
-To learn more about developing your project with Expo, look at the following resources:
+Learn More
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- "Expo Documentation" (https://docs.expo.dev/)
+- "React Native Documentation" (https://reactnative.dev/)
 
-## Join the community
+Developer
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Created by a student for a school activity.
