@@ -151,7 +151,7 @@ export default function Calculator() {
       contentContainerStyle={styles.content}
     >
       <Text style={[styles.title, { color: dark ? '#E8B8FF' : '#A64AC9' }]}>
-        PinkCalc ♡
+        My Calculator
       </Text>
 
       <Display value={input} dark={dark} />
